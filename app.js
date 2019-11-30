@@ -1,15 +1,22 @@
 const express = require("express");
 const mongoose = require("./database/mongoose");
+const path = require("path");
 
 const userRoutes = require("./routes/user");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+const pathToPublic = path.join(__dirname, "public");
+app.use(express.static(pathToPublic));
+
+app.set("view engine", "ejs");
+app.set("views", "views");
+
 app.use(userRoutes);
 
 app.get("", (req, res, next) => {
-  res.send("Hello World");
+  res.render("index");
 });
 
 //default error
