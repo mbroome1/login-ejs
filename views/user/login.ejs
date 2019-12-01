@@ -1,15 +1,15 @@
 <%- include('../partials/header'); %>
 
 <div class="container">
-  <div class="row">
-    <div class="col">
-      <h1>Login</h1>
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <h1>Login <%= title %></h1>
     </div>
   </div>
 </div>
 <div class="container">
-  <div class="row">
-    <div class="col-md-6">
+  <div class="row justify-content-center my-3">
+    <div class="col-md-5">
       <form method="POST" action="/login">
         <div class="form-group">
           <label for="email">Email address</label>
@@ -17,6 +17,7 @@
             type="email"
             class="form-control"
             id="email"
+            name="email"
             aria-describedby="emailHelp"
             placeholder="Enter email"
           />
@@ -28,9 +29,11 @@
             type="password"
             class="form-control"
             id="password"
+            name="password"
             placeholder="Password"
           />
         </div>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <button type="submit" class="btn btn-primary">Login</button>
       </form>
     </div>
