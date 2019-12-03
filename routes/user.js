@@ -2,25 +2,79 @@ const express = require("express");
 const User = require("./../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { check, validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const router = express.Router();
 
 //Login route - GET
 router.get("/login", (req, res, next) => {
+  console.log(req.flash("error"));
   res.render("./user/login", {
-    title: "(from route)"
+    errorMessage: "",
+    user: req.user
   });
 });
 
 //Login route - POST
-router.post("/login", (req, res, next) => {
-  res.redirect("/");
+router.post(
+  "/login",
+  [
+    body("email")
+      .isEmail()
+      .withMessage("Please enter a valid email address"),
+    body("password")
+      .not()
+      .isEmpty()
+  ],
+  async (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    try {
+      const user = await User.findOne({ email: email });
+      if (!user) {
+        throw new Error("Email not found");
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        throw new Error("Invalid credentials");
+      }
+
+      const token = jwt.sign(
+        { email: user.email, userId: user._id.toString() },
+        process.env.JWT_SECRET,
+        { expiresIn: "20s" }
+      );
+
+      res
+        .cookie("token", token, {
+          httpOnly: true
+        })
+        .redirect("/");
+    } catch (err) {
+      console.log(err.message);
+      req.flash("error", err.message);
+      return res.render("./user/login", {
+        errorMessage: req.flash("error")
+      });
+    }
+  }
+);
+
+//Logout route - POST
+router.post("/logout", (req, res, next) => {
+  res.coo;
+  res.render("./user/login", {
+    errorMessage: "",
+    user: req.user
+  });
 });
 
 //Signup route - GET
 router.get("/signup", (req, res, next) => {
   res.render("./user/signup", {
-    errors: []
+    errors: [],
+    user: req.user
   });
 });
 
@@ -28,15 +82,15 @@ router.get("/signup", (req, res, next) => {
 router.post(
   "/signup",
   [
-    check("firstName")
+    body("firstName")
       .not()
       .isEmpty()
       .withMessage("First name not provided"),
-    check("lastName")
+    body("lastName")
       .not()
       .isEmpty()
       .withMessage("Last name not provided"),
-    check("email")
+    body("email")
       .not()
       .isEmpty()
       .isEmail()
@@ -51,11 +105,11 @@ router.post(
           }
         });
       }),
-    check("password", "Invalid password format")
+    body("password", "Invalid password format")
       .not()
       .isEmpty()
       .trim(),
-    check("repeatPassword", "passwords do no match").custom(
+    body("repeatPassword", "passwords do no match").custom(
       (value, { req }) => value === req.body.password
     )
   ],
@@ -87,9 +141,9 @@ router.post(
       });
       await user.save();
       res.redirect("/login");
-    } catch (error) {
+    } catch (err) {
       //console.log(error)
-      next(error);
+      next(err);
     }
   }
 );
