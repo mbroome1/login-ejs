@@ -55,19 +55,17 @@ router.post(
       console.log(err.message);
       req.flash("error", err.message);
       return res.render("./user/login", {
-        errorMessage: req.flash("error")
+        errorMessage: req.flash("error"),
+        user: undefined
       });
     }
   }
 );
 
 //Logout route - POST
-router.post("/logout", (req, res, next) => {
-  res.coo;
-  res.render("./user/login", {
-    errorMessage: "",
-    user: req.user
-  });
+router.get("/logout", (req, res, next) => {
+  res.clearCookie("token");
+  res.redirect("/login");
 });
 
 //Signup route - GET
@@ -124,7 +122,8 @@ router.post(
     if (!errors.isEmpty()) {
       console.log(errors.array());
       return res.status(422).render("./user/signup", {
-        errors: errors.array()
+        errors: errors.array(),
+        user: undefined
       });
     }
     // console.log(email, firstName, lastName, password);

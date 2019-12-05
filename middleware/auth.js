@@ -21,7 +21,7 @@ const auth = async (req, res, next) => {
     req.flash("error", err.message);
     return res.render("./user/login", {
       errorMessage: req.flash("error"),
-      user: ""
+      user: undefined
     });
   }
 };

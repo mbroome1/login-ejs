@@ -29,7 +29,7 @@ app.use(
   })
 );
 
-//application/x-www-form-urlencoded post data
+// application/x-www-form-urlencoded post data
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cookieParser());
@@ -38,12 +38,17 @@ const csrfProtection = csrf({ cookie: true });
 app.use(csrfProtection);
 app.use(flash());
 
+// Cross-site request forgery prevention on forms, and disable cache browser storage
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
+  res.set(
+    "Cache-Control",
+    "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0"
+  );
   next();
 });
 
-//Get user middleware when logged in, and setup user on the request (req.user)
+// Get user middleware when logged in, and setup user on the request (req.user)
 app.use(userMiddleware, async (req, res, next) => {
   if (!req.userId) {
     return next();
@@ -66,7 +71,7 @@ app.get("/", auth, (req, res, next) => {
   });
 });
 
-//default error
+// default error
 app.use((req, res, next) => {
   res.status(404).send("404");
 });
@@ -75,7 +80,7 @@ app.use((error, req, res, next) => {
   res.send(`Woops..<br><br>${error}`);
 });
 
-//mongoose connection string
+// mongoose connection string
 mongoose
   .then(() => {
     app.listen(port, () => {
