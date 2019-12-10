@@ -1,14 +1,44 @@
 <%- include('./partials/header'); %>
 <div class="container">
   <div class="row">
-    <div class="col">
+    <div class="col-md-12 border-bottom border-dark">
       <h1>Index Page</h1>
+    </div>
+  </div>
+  <div class="row my-3">
+    <div class="col-md-6">
+      <h2>Hello!</h2>
       <% if (user) { %>
+      <p><%= user.firstName %> <%= user.lastName %>. You are logged in.</p>
+      <% } %>
+    </div>
+    <div class="col-md-6">
+      <h2>Delete Account</h2>
       <p>
-        Hello, <%= user.firstName %> <%= user.lastName %>. You are logged in.
+        To delete your account, confirm your password and click delete below
       </p>
+      <form class="form" action="/delete/<%= user._id %>" method="post">
+        <div class="form-group">
+          <label for="password" class="mr-2 sr-only">Password</label>
+          <input
+            class="form-control mr-2"
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Password"
+          />
+        </div>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
+      <% if (errorMessage) { %>
+      <div class="row justify-content-center text-danger">
+        <div class="col-md-6"><%= errorMessage %></div>
+      </div>
       <% } %>
     </div>
   </div>
 </div>
+
 <%- include('./partials/footer'); %>

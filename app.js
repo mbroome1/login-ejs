@@ -67,7 +67,8 @@ app.use(userRoutes);
 
 app.get("/", auth, (req, res, next) => {
   res.render("index", {
-    user: req.user
+    user: req.user,
+    errorMessage: req.flash("error")
   });
 });
 
